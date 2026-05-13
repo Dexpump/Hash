@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <title>哈希校验工坊 | 本地极速多算法</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card-bg: #ffffff;
+      --text: #0b1a2f;
+      --text-secondary: #475569;
+      --border: #e2e8f0;
+      --upload-bg: #f8fafc;
+      --upload-border: #cbd5e1;
+      --result-bg: #0f172a;
+      --result-text: #e2e8f0;
+      --result-file-name: #f8fafc;
+      --result-file-size: #cbd5e1;
+      --label-color: #94a3b8;
+      --value-color: #cbd5e1;
+      --highlight-bg: #16a34a;
+      --highlight-text: #ffffff;
+      --file-info-bg: #ffffff;
+      --compare-bg: #f8fafc;
+      --empty-text: #64748b;
+      --progress-text: #475569;
+      --btn-bg: #ffffff;
+      --btn-text: #0f172a;
+      --btn-border: #cbd5e1;
+      --btn-hover-bg: #f1f5f9;
+      --btn-hover-border: #3b82f6;
+      --btn-active-bg: #e2e8f0;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --border: #334155;
+      --upload-bg: #1e293b;
+      --upload-border: #475569;
+      --result-bg: #0a0f1a;
+      --result-text: #e2e8f0;
+      --result-file-name: #f8fafc;
+      --result-file-size: #cbd5e1;
+      --label-color: #64748b;
+      --value-color: #cbd5e1;
+      --highlight-bg: #16a34a;
+      --highlight-text: #ffffff;
+      --file-info-bg: #1e293b;
+      --compare-bg: #1e293b;
+      --empty-text: #64748b;
+      --progress-text: #94a3b8;
+      --btn-bg: #1e293b;
+      --btn-text: #f1f5f9;
+      --btn-border: #475569;
+      --btn-hover-bg: #334155;
+      --btn-hover-border: #3b82f6;
+      --btn-active-bg: #475569;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(145deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 85%, black) 100%);
+      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      margin: 0;
+      transition: background 0.3s ease;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 920px;
+      background: var(--card-bg);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
+      border-radius: 1.8rem;
+      padding: 1.5rem 1.6rem 1.8rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 2rem;
+      padding: 0.35rem 0.8rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.25s;
+      color: var(--btn-text);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-weight: 500;
+    }
+
+    .theme-toggle:hover {
+      background: var(--btn-hover-bg);
+      border-color: var(--btn-hover-border);
+      transform: scale(1.03);
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+      font-size: 1.6rem;
+      color: var(--text);
+      margin-bottom: 0.1rem;
+      letter-spacing: -0.3px;
+      padding-right: 4rem;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      margin-bottom: 1.2rem;
+      font-size: 0.85rem;
+      border-left: 3px solid #3b82f6;
+      padding-left: 0.7rem;
+      font-weight: 450;
+    }
+
+    .upload-area {
+      background: var(--upload-bg);
+      border: 2px dashed var(--upload-border);
+      border-radius: 1rem;
+      padding: 0.65rem 0.8rem;
+      text-align: center;
+      transition: all 0.2s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+      margin-bottom: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .upload-area:hover {
+      border-color: #3b82f6;
+      background: color-mix(in srgb, var(--upload-bg) 93%, #3b82f6);
+    }
+
+    .upload-area.drag-active {
+      border-color: #2563eb;
+      background: color-mix(in srgb, var(--upload-bg) 88%, #3b82f6);
+      transform: scale(1.01);
+    }
+
+    .upload-icon {
+      font-size: 1.4rem;
+    }
+
+    .upload-text {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .upload-hint {
+      color: var(--text-secondary);
+      font-size: 0.7rem;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-info {
+      background: var(--file-info-bg);
+      border-radius: 0.8rem;
+      padding: 0.5rem 0.9rem;
+      margin: 0.5rem 0 0.8rem;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.8rem;
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+
+    .file-name {
+      font-weight: 650;
+      color: var(--text);
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .file-size {
+      background: #e0e7ff;
+      color: #1e3a8a;
+      padding: 0.15rem 0.7rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    [data-theme="dark"] .file-size {
+      background: #312e81;
+      color: #c7d2fe;
+    }
+
+    .progress-container {
+      margin: 0.4rem 0 0.8rem;
+      display: none;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 0.3rem;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      border-radius: 8px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-detail {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--progress-text);
+    }
+
+    .hash-compare-section {
+      background: var(--compare-bg);
+      border-radius: 0.9rem;
+      padding: 0.6rem 0.9rem;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .compare-input {
+      flex: 2;
+      min-width: 180px;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 1.5rem;
+      font-size: 0.8rem;
+      background: var(--card-bg);
+      color: var(--text);
+      outline: none;
+      transition: 0.2s;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .compare-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    /* 完全一致的按钮样式 - 对比按钮与清除按钮 */
+    .compare-btn,
+    .clear-compare {
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      padding: 0.45rem 0.9rem;
+      border-radius: 1.5rem;
+      font-weight: 600;
+      color: var(--btn-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      font-family: inherit;
+      line-height: 1.4;
+      text-decoration: none;
+      outline: none;
+      min-width: 70px;
+    }
+
+    .compare-btn:hover,
+    .clear-compare:hover {
+      background: var(--btn-hover-bg);
+      border-color: var(--btn-hover-border);
+      color: var(--btn-text);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .compare-btn:active,
+    .clear-compare:active {
+      background: var(--btn-active-bg);
+      border-color: var(--btn-hover-border);
+      color: var(--btn-text);
+      transform: translateY(0);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .results-container {
+      background: var(--result-bg);
+      border-radius: 1rem;
+      padding: 1rem 1.1rem;
+      color: var(--result-text);
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+      max-height: 420px;
+      overflow-y: auto;
+      overflow-x: auto;
+      word-break: break-all;
+      transition: all 0.3s;
+      border: 1px solid #334155;
+      width: 100%;
+      white-space: pre-wrap;
+    }
+
+    .result-header {
+      color: var(--result-file-name);
+      margin-bottom: 0.2rem;
+      font-weight: 500;
+      font-family: 'Segoe UI', 'Inter', sans-serif;
+    }
+
+    .result-size {
+      color: var(--result-file-size);
+      margin-bottom: 0.6rem;
+      font-family: 'Segoe UI', 'Inter', sans-serif;
+    }
+
+    .hash-line {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0.4rem;
+      align-items: baseline;
+    }
+
+    .hash-label {
+      color: var(--label-color);
+      font-weight: 500;
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .hash-value {
+      color: var(--value-color);
+      letter-spacing: 0.2px;
+      font-weight: 400;
+      padding: 0.1rem 0.2rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .hash-value.match-highlight {
+      background: var(--highlight-bg);
+      color: var(--highlight-text);
+      font-weight: 600;
+      padding: 0.1rem 0.45rem;
+      border-radius: 5px;
+      box-shadow: 0 0 6px rgba(22, 163, 74, 0.5);
+    }
+
+    .empty-results {
+      color: var(--empty-text);
+      font-style: italic;
+      text-align: center;
+      padding: 1rem;
+      font-family: 'Segoe UI', 'Inter', sans-serif;
+    }
+
+    .footer-note {
+      margin-top: 0.6rem;
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0.4rem;
+      }
+
+      .card {
+        padding: 1rem;
+      }
+
+      .upload-area {
+        padding: 0.5rem 0.6rem;
+        gap: 0.4rem;
+      }
+
+      .hash-label {
+        min-width: 68px;
+      }
+
+      .hash-value {
+        white-space: normal;
+        word-break: break-all;
+      }
+
+      .theme-toggle {
+        top: 0.7rem;
+        right: 0.7rem;
+      }
+
+      .compare-btn,
+      .clear-compare {
+        padding: 0.4rem 0.7rem;
+        font-size: 0.75rem;
+        min-width: 60px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <button class="theme-toggle" id="themeToggle" title="">☀️</button>
+
+    <h1>
+      🔐 <span>哈希校验工坊</span>
+    </h1>
+    <div class="subtitle">本地极速计算 · 支持GB级文件 · 多算法同时输出</div>
+
+    <div class="upload-area" id="uploadArea">
+      <span class="upload-icon">📂</span>
+      <span class="upload-text">点击或拖拽文件</span>
+      <span class="upload-hint">SHA-256 · MD5 · SHA-1 · SHA-512 · BLAKE2sp · SHA3-256 · CRC32 等</span>
+      <input type="file" id="fileInput" aria-label="选择文件">
+    </div>
+
+    <div class="file-info" id="fileInfo" style="display: none;">
+      <span class="file-name" id="displayFileName"></span>
+      <span class="file-size" id="displayFileSize"></span>
+    </div>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+      </div>
+      <div class="progress-detail">
+        <span id="progressStage">准备读取文件...</span>
+        <span id="progressPercent">0%</span>
+      </div>
+    </div>
+
+    <div class="hash-compare-section">
+      <input type="text" class="compare-input" id="compareHashInput" placeholder="粘贴哈希值校验..." autocomplete="off">
+      <button class="compare-btn" id="compareBtn">🔍 校验</button>
+      <button class="clear-compare" id="clearCompareBtn">🧹 清除</button>
+    </div>
+
+    <div class="results-container" id="resultsContainer">
+      <div class="empty-results">等待文件上传，哈希值将自动显示在这里...</div>
+    </div>
+    <div class="footer-note">⚡ 纯自研算法 + Web Crypto API · 所有计算均在本地完成</div>
+  </div>
+
+  <script>
+    (function () {
+      // ---------- 暗黑模式 ----------
+      const themeToggle = document.getElementById('themeToggle');
+      const htmlElement = document.documentElement;
+
+      function setTheme(theme) {
+        htmlElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        themeToggle.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+      }
+
+      setTheme(localStorage.getItem('theme') || 'dark');
+      themeToggle.addEventListener('click', () => {
+        setTheme(htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+
+      // ---------- DOM 元素 ----------
+      const uploadArea = document.getElementById('uploadArea');
+      const fileInput = document.getElementById('fileInput');
+      const fileInfoDiv = document.getElementById('fileInfo');
+      const displayFileName = document.getElementById('displayFileName');
+      const displayFileSize = document.getElementById('displayFileSize');
+      const progressContainer = document.getElementById('progressContainer');
+      const progressFill = document.getElementById('progressFill');
+      const progressStage = document.getElementById('progressStage');
+      const progressPercent = document.getElementById('progressPercent');
+      const resultsContainer = document.getElementById('resultsContainer');
+      const compareInput = document.getElementById('compareHashInput');
+      const compareBtn = document.getElementById('compareBtn');
+      const clearCompareBtn = document.getElementById('clearCompareBtn');
+
+      let currentHashes = null;
+      let currentFile = null;
+
+      // ---------- 工具函数 ----------
+      function formatBytes(bytes) {
+        if (bytes === 0) return '0 字节';
+        const k = 1024;
+        const sizes = ['字节', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${(bytes / Math.pow(k, i)).toFixed(i > 0 ? 2 : 0)} ${sizes[i]}`;
+      }
+
+      function showFileInfo(file) {
+        if (!file) {
+          fileInfoDiv.style.display = 'none';
+          return;
+        }
+        displayFileName.textContent = `📄 ${file.name}`;
+        displayFileSize.textContent = formatBytes(file.size);
+        fileInfoDiv.style.display = 'flex';
+      }
+
+      function showProgress(show = true) {
+        progressContainer.style.display = show ? 'block' : 'none';
+        if (!show) {
+          progressFill.style.width = '0%';
+          progressStage.textContent = '准备读取文件...';
+          progressPercent.textContent = '0%';
+        }
+      }
+
+      function updateProgress(percent, stage = '') {
+        const rounded = Math.min(100, Math.round(percent));
+        progressFill.style.width = `${rounded}%`;
+        progressPercent.textContent = `${rounded}%`;
+        if (stage) progressStage.textContent = stage;
+      }
+
+      // ---------- 分块读取文件（带进度） ----------
+      async function readFileInChunks(file) {
+        const CHUNK_SIZE = 16 * 1024 * 1024; // 16MB 每块
+        const fileSize = file.size;
+        const chunks = [];
+        let offset = 0;
+
+        updateProgress(0, '正在读取文件...');
+
+        while (offset < fileSize) {
+          const end = Math.min(offset + CHUNK_SIZE, fileSize);
+          const blob = file.slice(offset, end);
+          const chunk = await blob.arrayBuffer();
+          chunks.push(new Uint8Array(chunk));
+
+          offset = end;
+          const readPercent = Math.round((offset / fileSize) * 100);
+          updateProgress(readPercent, `读取中 ${formatBytes(offset)} / ${formatBytes(fileSize)}`);
+
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+
+        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+        const result = new Uint8Array(totalLength);
+        let pos = 0;
+        for (const chunk of chunks) {
+          result.set(chunk, pos);
+          pos += chunk.length;
+        }
+
+        return result;
+      }
+
+      // ---------- 完全自研哈希算法库 ----------
+      function md5(uint8) {
+        const K = [
+          0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
+          0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+          0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
+          0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+          0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
+          0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+          0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
+          0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391
+        ];
+        let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+        const len = uint8.length;
+        const paddedLen = Math.ceil((len + 9) / 64) * 64;
+        const padded = new Uint8Array(paddedLen);
+        padded.set(uint8);
+        padded[len] = 0x80;
+        new DataView(padded.buffer).setUint32(paddedLen - 8, len * 8, true);
+        for (let off = 0; off < paddedLen; off += 64) {
+          const M = new Array(16);
+          for (let i = 0; i < 16; i++) M[i] = padded[off + i * 4] | (padded[off + i * 4 + 1] << 8) | (padded[off + i * 4 + 2] << 16) | (padded[off + i * 4 + 3] << 24);
+          let A = a0, B = b0, C = c0, D = d0;
+          for (let i = 0; i < 64; i++) {
+            let F, g;
+            if (i < 16) { F = (B & C) | (~B & D); g = i; }
+            else if (i < 32) { F = (D & B) | (~D & C); g = (5 * i + 1) % 16; }
+            else if (i < 48) { F = B ^ C ^ D; g = (3 * i + 5) % 16; }
+            else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+            F = (F + A + K[i] + M[g]) | 0;
+            A = D; D = C; C = B;
+            const s = [7, 12, 17, 22][i % 4 + (i < 16 ? 0 : i < 32 ? 1 : i < 48 ? 2 : 3)];
+            B = (B + ((F << s) | (F >>> (32 - s)))) | 0;
+          }
+          a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+        }
+        return [a0, b0, c0, d0].map(v => (v >>> 0).toString(16).padStart(8, '0')).join('');
+      }
+
+      function crc32(uint8) {
+        const table = new Uint32Array(256);
+        for (let i = 0; i < 256; i++) { let c = i; for (let j = 0; j < 8; j++)c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); table[i] = c; }
+        let crc = 0xFFFFFFFF;
+        for (let i = 0; i < uint8.length; i++)crc = table[(crc ^ uint8[i]) & 0xFF] ^ (crc >>> 8);
+        return (crc ^ 0xFFFFFFFF) >>> 0;
+      }
+
+      function crc64(uint8) {
+        const POLY_LOW = 0xD7870F42, POLY_HIGH = 0xC96C5795;
+        let crc_low = 0xFFFFFFFF, crc_high = 0xFFFFFFFF;
+        for (let i = 0; i < uint8.length; i++) {
+          const byte = uint8[i];
+          for (let bit = 0; bit < 8; bit++) {
+            const xorFlag = (crc_low & 1) !== 0;
+            crc_low = (crc_low >>> 1) | ((crc_high & 1) << 31);
+            crc_high >>>= 1;
+            if (byte & (1 << bit)) crc_low ^= 0x80000000;
+            if (xorFlag) { crc_low ^= POLY_LOW; crc_high ^= POLY_HIGH; }
+          }
+        }
+        crc_low ^= 0xFFFFFFFF; crc_high ^= 0xFFFFFFFF;
+        return (crc_high >>> 0).toString(16).padStart(8, '0') + (crc_low >>> 0).toString(16).padStart(8, '0');
+      }
+
+      function xxh64(uint8) {
+        let acc_low = 0x51D8E999, acc_high = 0xEF46DB37;
+        const len = uint8.length;
+        let offset = 0;
+        while (offset + 8 <= len) {
+          let lane_low = 0, lane_high = 0;
+          for (let j = 0; j < 4; j++) { lane_low |= uint8[offset + j] << (j * 8); lane_high |= uint8[offset + j + 4] << (j * 8); }
+          acc_low ^= lane_low; acc_high ^= lane_high;
+          const tl = acc_low;
+          acc_low = ((acc_low << 13) | (acc_high >>> 19)) ^ tl;
+          acc_high = ((acc_high << 13) | (tl >>> 19)) ^ acc_high;
+          offset += 8;
+        }
+        let rl = 0, rh = 0;
+        for (let i = offset; i < len; i++) {
+          if (i - offset < 4) rl |= uint8[i] << ((i - offset) * 8);
+          else rh |= uint8[i] << ((i - offset - 4) * 8);
+        }
+        acc_low ^= rl; acc_high ^= rh;
+        acc_low ^= len; acc_high ^= len >>> 31;
+        acc_low ^= acc_low >>> 17; acc_high ^= acc_high >>> 17;
+        return (acc_high >>> 0).toString(16).padStart(8, '0') + (acc_low >>> 0).toString(16).padStart(8, '0');
+      }
+
+      function blake2sp(uint8) {
+        const IV = new Uint32Array([0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A, 0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19]);
+        const SIGMA = [
+          [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3],
+          [11, 8, 12, 0, 5, 2, 15, 13, 10, 14, 3, 6, 7, 1, 9, 4], [7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8],
+          [9, 0, 5, 7, 2, 4, 10, 15, 14, 1, 11, 12, 6, 8, 3, 13], [2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9],
+          [12, 5, 1, 15, 14, 13, 4, 10, 0, 7, 6, 3, 9, 2, 8, 11], [13, 11, 7, 14, 12, 1, 3, 9, 5, 0, 15, 4, 8, 6, 2, 10],
+          [6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5], [10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0]
+        ];
+        const outlen = 32, block = 64;
+        const padLen = Math.ceil((uint8.length + 1 + 8) / block) * block;
+        const pad = new Uint8Array(padLen); pad.set(uint8); pad[uint8.length] = 0x80;
+        new DataView(pad.buffer).setUint32(padLen - 8, uint8.length, true);
+        const h = new Uint32Array(8); for (let i = 0; i < 8; i++)h[i] = IV[i];
+        h[0] ^= 0x01010000 ^ (outlen << 0);
+        for (let off = 0; off < padLen; off += block) {
+          const m = new Uint32Array(16);
+          for (let i = 0; i < 16; i++)m[i] = pad[off + i * 4] | (pad[off + i * 4 + 1] << 8) | (pad[off + i * 4 + 2] << 16) | (pad[off + i * 4 + 3] << 24);
+          const v = new Uint32Array(16);
+          for (let i = 0; i < 8; i++) { v[i] = h[i]; v[i + 8] = IV[i]; }
+          v[12] ^= (off / block) & 0xFFFFFFFF; v[13] ^= 0;
+          if (off + block >= padLen) v[14] = ~v[14] >>> 0;
+          function G(a, b, c, d, x, y) {
+            v[a] = (v[a] + v[b] + x) >>> 0; v[d] = ((v[d] ^ v[a]) >>> 16) | ((v[d] ^ v[a]) << 16);
+            v[c] = (v[c] + v[d]) >>> 0; v[b] = ((v[b] ^ v[c]) >>> 12) | ((v[b] ^ v[c]) << 20);
+            v[a] = (v[a] + v[b] + y) >>> 0; v[d] = ((v[d] ^ v[a]) >>> 8) | ((v[d] ^ v[a]) << 24);
+            v[c] = (v[c] + v[d]) >>> 0; v[b] = ((v[b] ^ v[c]) >>> 7) | ((v[b] ^ v[c]) << 25);
+          }
+          for (let r = 0; r < 10; r++) {
+            const s = SIGMA[r];
+            G(0, 4, 8, 12, m[s[0]], m[s[1]]); G(1, 5, 9, 13, m[s[2]], m[s[3]]);
+            G(2, 6, 10, 14, m[s[4]], m[s[5]]); G(3, 7, 11, 15, m[s[6]], m[s[7]]);
+            G(0, 5, 10, 15, m[s[8]], m[s[9]]); G(1, 6, 11, 12, m[s[10]], m[s[11]]);
+            G(2, 7, 8, 13, m[s[12]], m[s[13]]); G(3, 4, 9, 14, m[s[14]], m[s[15]]);
+          }
+          for (let i = 0; i < 8; i++)h[i] = (h[i] ^ v[i] ^ v[i + 8]) >>> 0;
+        }
+        const res = new Uint8Array(32);
+        for (let i = 0; i < 8; i++) { res[i * 4] = h[i] & 0xFF; res[i * 4 + 1] = (h[i] >>> 8) & 0xFF; res[i * 4 + 2] = (h[i] >>> 16) & 0xFF; res[i * 4 + 3] = (h[i] >>> 24) & 0xFF; }
+        return Array.from(res).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+
+      function sha3_256(uint8) {
+        const RC = [0x0000000000000001n, 0x0000000000008082n, 0x800000000000808An, 0x8000000080008000n, 0x000000000000808Bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n, 0x000000000000008An, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000An, 0x000000008000808Bn, 0x800000000000008Bn, 0x8000000000008089n, 0x8000000000008003n, 0x8000000000008002n, 0x8000000000000080n, 0x000000000000800An, 0x800000008000000An, 0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n];
+        const rate = 136, outLen = 32;
+        const padLen = Math.ceil((uint8.length + 1) / rate) * rate;
+        const pad = new Uint8Array(padLen); pad.set(uint8); pad[uint8.length] = 0x06; pad[padLen - 1] |= 0x80;
+        const state = new Array(25).fill(0n);
+        for (let off = 0; off < padLen; off += rate) {
+          for (let i = 0; i < rate / 8; i++) {
+            let w = 0n;
+            for (let j = 0; j < 8; j++)w |= BigInt(pad[off + i * 8 + j]) << BigInt(j * 8);
+            state[i] ^= w;
+          }
+          for (let r = 0; r < 24; r++) {
+            const C = new Array(5); for (let x = 0; x < 5; x++)C[x] = state[x] ^ state[x + 5] ^ state[x + 10] ^ state[x + 15] ^ state[x + 20];
+            const D = new Array(5); for (let x = 0; x < 5; x++)D[x] = C[(x + 4) % 5] ^ ((C[(x + 1) % 5] << 1n) | (C[(x + 1) % 5] >> 63n));
+            for (let x = 0; x < 5; x++)for (let y = 0; y < 5; y++)state[x + y * 5] ^= D[x];
+            let [cx, cy] = [1, 0]; let cur = state[1];
+            for (let t = 0; t < 24; t++) {
+              const [nx, ny] = [cy, (2 * cx + 3 * cy) % 5];
+              const tmp = state[nx + ny * 5];
+              state[nx + ny * 5] = ((cur << BigInt((t + 1) * (t + 2) / 2)) | (cur >> (64n - BigInt((t + 1) * (t + 2) / 2)))) & 0xFFFFFFFFFFFFFFFFn;
+              cur = tmp;[cx, cy] = [nx, ny];
+            }
+            for (let y = 0; y < 5; y++) {
+              const T = new Array(5); for (let x = 0; x < 5; x++)T[x] = state[x + y * 5];
+              for (let x = 0; x < 5; x++)state[x + y * 5] = T[x] ^ (~T[(x + 1) % 5] & T[(x + 2) % 5]);
+            }
+            state[0] ^= RC[r];
+          }
+        }
+        const out = new Uint8Array(outLen);
+        for (let i = 0; i < outLen; i++)out[i] = Number((state[Math.floor(i / 8)] >> BigInt((i % 8) * 8)) & 0xFFn);
+        return Array.from(out).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+
+      // ---------- 核心计算调度 (带详细进度) ----------
+      async function computeAllHashes(file) {
+        updateProgress(0, '开始读取文件...');
+        const uint8 = await readFileInChunks(file);
+        updateProgress(40, '文件读取完成，开始计算哈希...');
+
+        const webAlgos = ['SHA-256', 'SHA-384', 'SHA-512', 'SHA-1'];
+        const supported = [];
+        for (let algo of webAlgos) {
+          try { await crypto.subtle.digest(algo, new Uint8Array(1)); supported.push(algo); } catch (e) { }
+        }
+
+        const webPromises = supported.map(algo =>
+          crypto.subtle.digest(algo, uint8.buffer).then(buf => ({
+            label: algo,
+            value: Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+          })).catch(() => ({ label: algo, value: '错误' }))
+        );
+
+        updateProgress(42, '计算 CRC32...');
+        const crc32Val = await new Promise(res => setTimeout(() => res(crc32(uint8)), 0));
+        updateProgress(48, '计算 CRC64...');
+        const crc64Val = await new Promise(res => setTimeout(() => res(crc64(uint8)), 0));
+        updateProgress(54, '计算 XXH64...');
+        const xxh64Val = await new Promise(res => setTimeout(() => res(xxh64(uint8)), 0));
+        updateProgress(62, '计算 MD5...');
+        const md5Val = await new Promise(res => setTimeout(() => res(md5(uint8)), 0));
+        updateProgress(72, '计算 BLAKE2sp...');
+        const blakeVal = await new Promise(res => setTimeout(() => res(blake2sp(uint8)), 0));
+        updateProgress(82, '计算 SHA3-256...');
+        const sha3Val = await new Promise(res => setTimeout(() => res(sha3_256(uint8)), 0));
+
+        updateProgress(88, '完成 Web Crypto 计算...');
+        const webResults = await Promise.all(webPromises);
+
+        updateProgress(95, '整理结果...');
+        const resultMap = {};
+        webResults.forEach(r => resultMap[r.label] = r.value);
+
+        const final = {};
+        final['CRC32'] = (crc32Val >>> 0).toString(16).padStart(8, '0');
+        final['CRC64'] = crc64Val;
+        final['XXH64'] = xxh64Val;
+        final['MD5'] = md5Val;
+        final['BLAKE2sp'] = blakeVal;
+        final['SHA3-256'] = sha3Val;
+        final['SHA-1'] = resultMap['SHA-1'] || '不支持';
+        final['SHA-256'] = resultMap['SHA-256'] || '不支持';
+        final['SHA-384'] = resultMap['SHA-384'] || '不支持';
+        final['SHA-512'] = resultMap['SHA-512'] || '不支持';
+
+        updateProgress(100, '计算完成！');
+        return final;
+      }
+
+      // ---------- 渲染结果 ----------
+      function renderResults(hashes, compareStr = '') {
+        if (!hashes || Object.keys(hashes).length === 0) {
+          resultsContainer.innerHTML = '<div class="empty-results">暂无哈希数据</div>';
+          return;
+        }
+        const order = ['CRC32', 'CRC64', 'XXH64', 'MD5', 'SHA-1', 'SHA-256', 'BLAKE2sp', 'SHA3-256', 'SHA-384', 'SHA-512'];
+        let html = '';
+        if (currentFile) {
+          html += `<div class="result-header">📋 名称: ${escapeHtml(currentFile.name)}</div>`;
+          html += `<div class="result-size">📏 大小: ${formatBytes(currentFile.size)}</div>`;
+        }
+        const clean = compareStr.trim().toLowerCase();
+        for (let label of order) {
+          if (hashes[label] === undefined) continue;
+          const val = hashes[label].toString();
+          const match = clean !== '' && val.toLowerCase() === clean;
+          html += `<div class="hash-line"><span class="hash-label">${label}:</span> <span class="hash-value${match ? ' match-highlight' : ''}">${val}</span></div>`;
+        }
+        resultsContainer.innerHTML = html;
+      }
+
+      function escapeHtml(t) { return String(t).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]); }
+
+      async function handleFile(file) {
+        if (!file) return;
+        currentFile = file;
+        showFileInfo(file);
+        resultsContainer.innerHTML = '<div class="empty-results">⏳ 正在计算哈希值，大文件请稍候...</div>';
+        showProgress(true);
+        updateProgress(0, '准备读取文件...');
+
+        try {
+          const hashes = await computeAllHashes(file);
+          currentHashes = hashes;
+          renderResults(hashes, compareInput.value);
+        } catch (e) {
+          resultsContainer.innerHTML = `<div style="color:#f87171;">❌ 错误: ${escapeHtml(e.message)}</div>`;
+          currentHashes = null;
+        } finally {
+          setTimeout(() => showProgress(false), 800);
+        }
+      }
+
+      // 事件绑定
+      uploadArea.addEventListener('click', (e) => { if (e.target.tagName !== 'INPUT') fileInput.click(); });
+      fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+      uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-active'); });
+      uploadArea.addEventListener('dragleave', e => { e.preventDefault(); uploadArea.classList.remove('drag-active'); });
+      uploadArea.addEventListener('drop', e => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-active');
+        if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; handleFile(e.dataTransfer.files[0]); }
+      });
+      compareBtn.addEventListener('click', () => { if (currentHashes) renderResults(currentHashes, compareInput.value); });
+      clearCompareBtn.addEventListener('click', () => { compareInput.value = ''; if (currentHashes) renderResults(currentHashes, ''); });
+      compareInput.addEventListener('input', () => { if (currentHashes) renderResults(currentHashes, compareInput.value); });
+    })();
+  </script>
+</body>
+
+</html>
